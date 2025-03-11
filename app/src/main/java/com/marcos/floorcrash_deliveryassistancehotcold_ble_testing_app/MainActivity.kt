@@ -1,13 +1,15 @@
 package com.marcos.floorcrash_deliveryassistancehotcold_ble_testing_app
 
 import android.os.Bundle
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 
@@ -18,6 +20,8 @@ class MainActivity : ComponentActivity() {
         val webView = WebView(this).apply {
             settings.javaScriptEnabled = true
             webViewClient = WebViewClient()
+            webChromeClient = WebChromeClient()
+            addJavascriptInterface(WebAppInterface(), "AndroidBridge")
             setBackgroundColor(0xFF000000.toInt())
             loadUrl("file:///android_asset/index.html")
             layoutParams = android.view.ViewGroup.LayoutParams(
@@ -35,6 +39,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 )
             }
+        }
+    }
+
+    inner class WebAppInterface {
+        @JavascriptInterface
+        fun receiveTestMessage(input: String) {
+            Toast.makeText(this@MainActivity, input, Toast.LENGTH_SHORT).show()
         }
     }
 }

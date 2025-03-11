@@ -17,7 +17,14 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build:react": "npm run build",
+    "copy:react": "xcopy /s /y /e build\\* ..\\app\\src\\main\\assets\\",
+    "build:all": "npm run build:react && npm run copy:react",
+    "boot:emulator": "start \"\" \"%ANDROID_HOME%/emulator/emulator\" -avd Resizable_Experimental_API_Baklava",
+    "wait:device": "powershell -Command \"& {do { Start-Sleep -Seconds 2 } while ((& '%ANDROID_HOME%\\platform-tools\\adb.exe' shell getprop sys.boot_completed) -ne '1') }\"",
+    "run:android": "npm run boot:emulator && npm run wait:device && cd .. && gradlew assembleDebug && gradlew installDebug",
+    "build:android": "npm run build:all && npm run run:android"
   },
   "eslintConfig": {
     "extends": [

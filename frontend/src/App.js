@@ -8,8 +8,15 @@ import HotColdBluetoothPage from "./HotColdBluetoothPage";
 function HomePage() {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
+  const [isCentral, setIsCentral] = useState(true);
+
+  function toggleRole() {
+      setIsCentral(!isCentral);
+      window.AndroidBridge?.setBLEMode(isCentral ? "PERIPHERAL" : "CENTRAL");
+    }
 
   function handleSubmit() {
+    window.AndroidBridge?.startBLE();
     navigate("/bluetoothsearch");
   }
 
@@ -17,10 +24,10 @@ function HomePage() {
     try {
       const inputValue = document.getElementById("bluetoothIdInput").value;
       if (window.AndroidBridge && inputValue.trim().length != 0) {
-        window.AndroidBridge.receiveTestMessage(inputValue);
+        window.AndroidBridge.receiveTestMessage(inputValue, isCentral);
         handleSubmit();
       } else if (!window.AndroidBridge) {
-        setErrorMessage("Backend connection is unavailable");
+        setErrorMessage("AndroidBridge connection is unavailable");
       } else if (inputValue.trim().length === 0) {
         setErrorMessage("Empty Bluetooth code");
       } else {
@@ -42,6 +49,9 @@ function HomePage() {
             placeholder="Enter Bluetooth Code..."
             className="placeholder-black placeholder-opacity-50 green-style"
           />
+          <label className="text-white">
+            <input type="checkbox" checked={isCentral} onChange={toggleRole} /> Central Mode
+          </label>
           <button onClick={sendDataToKotlin} className="green-style">
             Submit
           </button>

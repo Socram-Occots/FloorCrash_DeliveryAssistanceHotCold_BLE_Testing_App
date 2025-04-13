@@ -9,6 +9,7 @@ function HomePage() {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   const [isCentral, setIsCentral] = useState(true);
+  const regexMac = "/^((([0-9A-F]{2}:){5})|(([0-9A-F]{2}-){5})|([0-9A-F]{10}))([0-9A-F]{2})$/i";
 
   function toggleRole() {
       setIsCentral(!isCentral);
@@ -23,9 +24,11 @@ function HomePage() {
   function sendDataToKotlin() {
     try {
       const inputValue = document.getElementById("bluetoothIdInput").value;
-      if (window.AndroidBridge && inputValue.trim().length != 0) {
-        window.AndroidBridge.receiveTestMessage(inputValue, isCentral);
+      if (window.AndroidBridge && inputValue.trim().length != 0 && regexMac.test(inputValue)) {
+        window.AndroidBridge.receiveID(inputValue, isCentral);
         handleSubmit();
+      } else if (!regexMac.test(inputValue)) {
+        setErrorMessage("Invalid MAC Address!");
       } else if (!window.AndroidBridge) {
         setErrorMessage("AndroidBridge connection is unavailable");
       } else if (inputValue.trim().length === 0) {

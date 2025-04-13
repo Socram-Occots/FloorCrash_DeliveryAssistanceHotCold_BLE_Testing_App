@@ -26,7 +26,8 @@ class MainActivity : ComponentActivity() {
 
     private var modeBLE : String = "CENTRAL"
     private var isCentral : Boolean = true
-    private var webView: WebView? = null
+    private var webView : WebView? = null
+    private var otherdeviceID : String? = null
 
     @RequiresApi(Build.VERSION_CODES.S)
     private val requiredPermissions = arrayOf(
@@ -108,18 +109,28 @@ class MainActivity : ComponentActivity() {
         }
 
         @JavascriptInterface
-        fun receiveTestMessage(input: String, mode: String) {
+        fun receiveID(input: String, mode: String) {
             Toast.makeText(this@MainActivity, "Connecting as $mode to $input", Toast.LENGTH_SHORT).show()
+            otherdeviceID = input
         }
 
         @JavascriptInterface
         fun startBLE() {
             if (isCentral) {
                 val intent = Intent(this@MainActivity, CentralActivity::class.java)
+                intent.putExtra("TARGET_DEVICE_ID", otherdeviceID)
                 startActivity(intent)
             } else {
                 val intent = Intent(this@MainActivity, PeripheralActivity::class.java)
+                intent.putExtra("TARGET_DEVICE_ID", otherdeviceID)
                 startActivity(intent)
+            }
+        }
+
+        @JavascriptInterface
+        fun backToMain() {
+            runOnUiThread {
+                onBackPressedDispatcher.onBackPressed()
             }
         }
     }
